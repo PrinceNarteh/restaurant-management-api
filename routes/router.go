@@ -7,5 +7,6 @@ func Router(app *fiber.App) {
 	FoodRoutes(router)
 	InvoiceRoutes(router)
 	MenuRoutes(router)
+	TableRoutes(router)
 	UserRoutes(router)
 }
