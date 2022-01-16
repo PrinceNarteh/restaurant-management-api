@@ -6,7 +6,7 @@ import (
 )
 
 func MenuRoutes(router fiber.Router) {
-	menuRouter := router.Group("/Menus")
+	menuRouter := router.Group("/menus")
 	menuRouter.Get("/", controllers.GetMenus)
 	menuRouter.Get("/:menuId", controllers.GetMenu)
 	menuRouter.Post("/", controllers.CreateMenu)

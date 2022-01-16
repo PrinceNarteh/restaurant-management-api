@@ -6,7 +6,7 @@ import (
 )
 
 func OrderRoutes(router fiber.Router) {
-	orderRouter := router.Group("/Orders")
+	orderRouter := router.Group("/orders")
 	orderRouter.Get("/", controllers.GetOrders)
 	orderRouter.Get("/:orderId", controllers.GetOrder)
 	orderRouter.Post("/", controllers.CreateOrder)

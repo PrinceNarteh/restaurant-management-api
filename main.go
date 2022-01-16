@@ -4,11 +4,15 @@ import (
 	"log"
 	"os"
 
+	"github.com/PrinceNarteh/restaurant-management-api/database"
 	"github.com/PrinceNarteh/restaurant-management-api/routes"
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
+	// connecting to database
+	database.Connect()
+
 	app := fiber.New()
 
 	port := os.Getenv("PORT")
