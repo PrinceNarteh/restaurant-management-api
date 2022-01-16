@@ -8,7 +8,7 @@ import (
 func InvoiceRoutes(router fiber.Router) {
 	invoiceRouter := router.Group("/Invoices")
 	invoiceRouter.Get("/", controllers.GetInvoices)
-	invoiceRouter.Get("/:InvoiceId", controllers.GetInvoice)
+	invoiceRouter.Get("/:invoiceId", controllers.GetInvoice)
 	invoiceRouter.Post("/", controllers.CreateInvoice)
-	invoiceRouter.Patch("/:InvoiceId", controllers.UpdateInvoice)
+	invoiceRouter.Patch("/:invoiceId", controllers.UpdateInvoice)
 }
