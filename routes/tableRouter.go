@@ -6,7 +6,7 @@ import (
 )
 
 func TableRoutes(router fiber.Router) {
-	tableRouter := router.Group("/Tables")
+	tableRouter := router.Group("/tables")
 	tableRouter.Get("/", controllers.GetTables)
 	tableRouter.Get("/:tableId", controllers.GetTable)
 	tableRouter.Post("/", controllers.CreateTable)
