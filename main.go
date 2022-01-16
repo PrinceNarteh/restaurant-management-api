@@ -20,8 +20,7 @@ func main() {
 		return c.SendString("OK")
 	})
 
-	router := app.Group("/api")
-	routes.FoodRoutes(router)
+	routes.Router(app)
 
 	log.Fatal(app.Listen(port))
 }

@@ -7,5 +7,8 @@ import (
 
 func FoodRoutes(router fiber.Router) {
 	foodRouter := router.Group("/foods")
-	foodRouter.Get("/", controllers.GetAllFoods)
+	foodRouter.Get("/", controllers.GetFoods)
+	foodRouter.Get("/:foodId", controllers.GetFood)
+	foodRouter.Post("/", controllers.CreateFood)
+	foodRouter.Patch("/:foodId", controllers.UpdateFood)
 }

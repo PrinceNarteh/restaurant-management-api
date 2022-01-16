@@ -11,9 +11,9 @@ func GetUsers(ctx *fiber.Ctx) error {
 }
 
 func Register(ctx *fiber.Ctx) error {
-	return ctx.SendString("Register")
+	return ctx.SendString("Register User")
 }
 
 func Login(ctx *fiber.Ctx) error {
-	return ctx.SendString("Get Users")
+	return ctx.SendString("Login User")
 }
