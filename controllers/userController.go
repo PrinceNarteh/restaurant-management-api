@@ -8,6 +8,8 @@ import (
 
 	db "github.com/PrinceNarteh/restaurant-management-api/database"
 	"github.com/PrinceNarteh/restaurant-management-api/models"
+	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -68,8 +70,31 @@ func GetUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
-func Register(ctx *fiber.Ctx) error {
-	return ctx.SendString("Register User")
+func Register(c *fiber.Ctx) error {
+	var user models.User
+
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "enable to parse request"})
+	}
+
+	if validateError := validator.New().Struct(user); validateError != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": validateError.Error()})
+	}
+
+	count, err := db.UserCollection.CountDocuments(ctx, bson.D{{"$or", bson.A{bson.D{{"email", user.Email}}, bson.D{{"phoneNumber", user.PhoneNumber}}}}})
+	defer cancel()
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if count > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "User with this email or phone number already exists."})
+	}
+
+	user.HashPassword()
+
+	return c.SendString("Register User")
 }
 
 func Login(ctx *fiber.Ctx) error {

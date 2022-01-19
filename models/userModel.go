@@ -17,7 +17,7 @@ type User struct {
 	Email        *string            `json:"email" validate:"required,email"`
 	Password     *string            `json:"password" validate:"required,min=6"`
 	Avatar       *string            `json:"avatar" validate:"required"`
-	Phone        *string            `json:"phone"`
+	PhoneNumber  *string            `json:"phoneNumber"`
 	AccessToken  *string            `json:"accessToken"`
 	RefreshToken *string            `json:"refreshToken"`
 }
