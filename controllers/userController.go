@@ -7,11 +7,12 @@ import (
 	"time"
 
 	db "github.com/PrinceNarteh/restaurant-management-api/database"
+	"github.com/PrinceNarteh/restaurant-management-api/helpers"
 	"github.com/PrinceNarteh/restaurant-management-api/models"
-	"github.com/go-playground/validator"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -93,8 +94,22 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	user.HashPassword()
+	user.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.ID = primitive.NewObjectID()
+	user.UserId = user.ID.Hex()
 
-	return c.SendString("Register User")
+	accessToken := helpers.GenerateAccessToken(&user)
+	refreshToken := helpers.GenerateRefreshToken(&user)
+	user.AccessToken = &accessToken
+	user.RefreshToken = &refreshToken
+
+	result, err := db.UserCollection.InsertOne(ctx, user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "error creating user"})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"insertionNumber": result})
 }
 
 func Login(ctx *fiber.Ctx) error {
