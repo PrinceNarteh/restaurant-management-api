@@ -9,7 +9,6 @@ import (
 	db "github.com/PrinceNarteh/restaurant-management-api/database"
 	"github.com/PrinceNarteh/restaurant-management-api/helpers"
 	"github.com/PrinceNarteh/restaurant-management-api/models"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -78,8 +77,8 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "enable to parse request"})
 	}
 
-	if validateError := validator.New().Struct(user); validateError != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": validateError.Error()})
+	if validateError := helpers.ValidateStruct(user); validateError != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": validateError})
 	}
 
 	count, err := db.UserCollection.CountDocuments(ctx, bson.D{{"$or", bson.A{bson.D{{"email", user.Email}}, bson.D{{"phoneNumber", user.PhoneNumber}}}}})
@@ -104,14 +103,38 @@ func Register(c *fiber.Ctx) error {
 	user.AccessToken = &accessToken
 	user.RefreshToken = &refreshToken
 
-	result, err := db.UserCollection.InsertOne(ctx, user)
+	_, err = db.UserCollection.InsertOne(ctx, user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "error creating user"})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"insertionNumber": result})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"accessToken": accessToken, "refreshToken": refreshToken})
 }
 
-func Login(ctx *fiber.Ctx) error {
-	return ctx.SendString("Login User")
+func Login(c *fiber.Ctx) error {
+	var user models.User
+	var request struct {
+		email    string
+		password string
+	}
+
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "could not pass json"})
+	}
+
+	err := db.UserCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&user)
+	defer cancel()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "error finding user"})
+	}
+
+	isValid := user.ComparePassword(request.password)
+	if !isValid {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid credentails"})
+	}
+
+	accessToken := helpers.GenerateAccessToken(&user)
+	refreshToken := helpers.GenerateRefreshToken(&user)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"accessToken": accessToken, "refreshToken": refreshToken})
 }
