@@ -10,8 +10,7 @@ type ErrorResponse struct {
 
 func ValidateStruct(s interface{}) []*ErrorResponse {
 	var errors []*ErrorResponse
-	validate := validator.New()
-	err := validate.Struct(s)
+	err := validator.New().Struct(s)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			var element ErrorResponse
