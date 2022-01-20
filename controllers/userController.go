@@ -100,8 +100,6 @@ func Register(c *fiber.Ctx) error {
 
 	accessToken := helpers.GenerateAccessToken(&user)
 	refreshToken := helpers.GenerateRefreshToken(&user)
-	user.AccessToken = &accessToken
-	user.RefreshToken = &refreshToken
 
 	_, err = db.UserCollection.InsertOne(ctx, user)
 	if err != nil {

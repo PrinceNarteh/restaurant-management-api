@@ -48,5 +48,39 @@ func GenerateRefreshToken(user *models.User) string {
 	}
 	return refreshToken
 }
-func ValidateAccessToken()  {}
-func ValidateRefreshToken() {}
+
+func ValidateAccessToken(accessToken string) (claims *SignedDetails, msg string) {
+	token, err := jwt.ParseWithClaims(accessToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
+		return SECRET_KEY, nil
+	})
+
+	claims, ok := token.Claims.(*SignedDetails)
+	if !ok {
+		msg = err.Error()
+		return
+	}
+
+	if claims.ExpiresAt < time.Now().Unix() {
+		msg = err.Error()
+	}
+
+	return claims, msg
+}
+
+func ValidateRefreshToken(refreshToken string) (claims *SignedDetails, msg string) {
+	token, err := jwt.ParseWithClaims(refreshToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
+		return SECRET_KEY, nil
+	})
+
+	claims, ok := token.Claims.(*SignedDetails)
+	if !ok {
+		msg = err.Error()
+		return
+	}
+
+	if claims.ExpiresAt < time.Now().Unix() {
+		msg = err.Error()
+	}
+
+	return claims, msg
+}
