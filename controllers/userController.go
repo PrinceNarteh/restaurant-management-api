@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 
 func GetUsers(c *fiber.Ctx) error {
 

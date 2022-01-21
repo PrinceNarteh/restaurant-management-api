@@ -11,6 +11,7 @@ import (
 var (
 	UserCollection *mongo.Collection
 	FoodCollection *mongo.Collection
+	MenuCollection *mongo.Collection
 )
 
 func Connect() {
@@ -32,4 +33,5 @@ func Connect() {
 	DB := client.Database("restaurant-management")
 	UserCollection = DB.Collection("users")
 	FoodCollection = DB.Collection("foods")
+	MenuCollection = DB.Collection("menus")
 }
