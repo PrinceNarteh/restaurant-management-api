@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 )
 
-var SECRET_KEY string = os.Getenv("SECRET_KEY")
+var SecretKey string = os.Getenv("SECRET_KEY")
 
 type SignedDetails struct {
 	Email     string
@@ -29,7 +29,7 @@ func GenerateAccessToken(user *models.User) string {
 			ExpiresAt: jwt.NewTime(float64(time.Now().Add(time.Minute * time.Duration(30)).Unix())),
 		},
 	}
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(SECRET_KEY)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(SecretKey)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -42,7 +42,7 @@ func GenerateRefreshToken(user *models.User) string {
 			ExpiresAt: jwt.NewTime(float64(time.Now().Add(time.Hour * time.Duration(198)).Unix())),
 		},
 	}
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodES256, claims).SignedString(SECRET_KEY)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodES256, claims).SignedString(SecretKey)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -51,7 +51,7 @@ func GenerateRefreshToken(user *models.User) string {
 
 func ValidateAccessToken(accessToken string) (claims *SignedDetails, msg string) {
 	token, err := jwt.ParseWithClaims(accessToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
-		return SECRET_KEY, nil
+		return SecretKey, nil
 	})
 
 	claims, ok := token.Claims.(*SignedDetails)
@@ -69,7 +69,7 @@ func ValidateAccessToken(accessToken string) (claims *SignedDetails, msg string)
 
 func ValidateRefreshToken(refreshToken string) (claims *SignedDetails, msg string) {
 	token, err := jwt.ParseWithClaims(refreshToken, &SignedDetails{}, func(t *jwt.Token) (interface{}, error) {
-		return SECRET_KEY, nil
+		return SecretKey, nil
 	})
 
 	claims, ok := token.Claims.(*SignedDetails)
